@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20_190_205_170_919) do
     t.integer 'user_id'
     t.integer 'status', default: 0, null: false
     t.string 'identification'
+    t.string 'question_identification'
     t.integer 'question_id'
     t.datetime 'created_at', null: false
     t.datetime 'updated_at', null: false
@@ -46,6 +47,7 @@ ActiveRecord::Schema.define(version: 20_190_205_170_919) do
     t.integer 'user_id'
     t.integer 'status', default: 0, null: false
     t.string 'identification'
+    t.string 'election_identification'
     t.datetime 'created_at', null: false
     t.datetime 'updated_at', null: false
     t.index ['election_id'], name: 'index_questions_on_election_id'

@@ -8,7 +8,8 @@ class AnswersController < ApplicationController
   # GET /answers
   # GET /answers.json
   def index
-    @answers = Answer.where(status: 0)
+    question_identification = Question.find(params['question_id']).identification
+    @answers = Answer.where(question_identification: question_identification).where(status: 0)
   end
 
   # GET /answers/1
@@ -84,10 +85,10 @@ class AnswersController < ApplicationController
 
   def answer_create_service
     params = answer_params
-    question = @question.id
+    question = @question
     user = current_user
 
-    ::Services::AnswerServices::Create.new(params: params, question_id: question, user: user).call
+    ::Services::AnswerServices::Create.new(params: params, question: question, user: user).call
   end
 
   def answer_update_service

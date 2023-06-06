@@ -6,7 +6,7 @@ module Services
       def initialize(current_answer:, user:)
         @answer = current_answer
         @user = user
-        @question_id = answer.question_id
+        @question = answer.question
         @identification = answer.identification
         @version = (answer.version + 1)
         @status = 2
@@ -20,7 +20,7 @@ module Services
 
       private
 
-      attr_reader :answer, :user, :question_id, :identification, :version, :status
+      attr_reader :answer, :user, :question, :identification, :version, :status
 
       def delete_answer
         ActiveRecord::Base.transaction do
@@ -32,7 +32,7 @@ module Services
       def answer_create_service
         params = { name: answer.name }
 
-        ::Services::AnswerServices::Create.new(params: params, question_id: question_id, user: user, version: version, identification: identification, status: status).call
+        ::Services::AnswerServices::Create.new(params: params, question: question, user: user, version: version, identification: identification, status: status).call
       end
     end
   end

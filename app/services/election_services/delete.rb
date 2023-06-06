@@ -24,6 +24,7 @@ module Services
       def delete_election
         ActiveRecord::Base.transaction do
           election.update(status: 1)
+          delete_question_service
           election_create_service
         end
       end
@@ -31,6 +32,12 @@ module Services
       def election_create_service
         params = election.as_json(except: %i[id version user_id status identification created_at updated_at])
         ::Services::ElectionServices::Create.new(params: params, user: user, version: version, identification: identification, status: status).call
+      end
+
+      def delete_question_service
+        Question.where(election_identification: election.identification).each do |q|
+          ::Services::QuestionServices::Delete.new(current_question: q, user: user).call
+        end
       end
     end
   end

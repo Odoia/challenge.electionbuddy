@@ -8,7 +8,8 @@ class QuestionsController < ApplicationController
   # GET /questions
   # GET /questions.json
   def index
-    @questions = Question.where(status: 0)
+   election_identification = Election.find(params['election_id']).identification
+   @questions = Question.where(election_identification: election_identification).where(status: 0)
   end
 
   # GET /questions/1
@@ -82,10 +83,10 @@ class QuestionsController < ApplicationController
 
   def question_create_service
     params = question_params
-    election = @election.id
+    election = @election
     user = current_user
 
-    ::Services::QuestionServices::Create.new(params: params, election_id: election, user: user).call
+    ::Services::QuestionServices::Create.new(params: params, election: election, user: user).call
   end
 
   def question_update_service

@@ -3,9 +3,10 @@
 module Services
   module AnswerServices
     class Create
-      def initialize(params:, question_id:, user:, version: 1, identification: unique_identification, status: 0)
+      def initialize(params:, question:, user:, version: 1, identification: unique_identification, status: 0)
         @name = params['name']
-        @question_id = question_id
+        @question_id = question.id
+        @question_identification = question.identification
         @user = user
         @version = version
         @identification = identification
@@ -20,7 +21,7 @@ module Services
 
       private
 
-      attr_reader :params, :name, :question_id, :version, :user, :identification, :status
+      attr_reader :params, :name, :question_id, :version, :user, :identification, :status, :question_identification
 
       def create_answer
         ::Answer.new.tap do |a|
@@ -30,6 +31,7 @@ module Services
           a.status = status
           a.identification = identification
           a.question_id = question_id
+          a.question_identification = question_identification
           a.save
         end
       end

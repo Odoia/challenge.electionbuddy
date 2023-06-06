@@ -6,7 +6,7 @@ module Services
       def initialize(current_question:, user:)
         @question = current_question
         @user = user
-        @election = question.election_id
+        @election = question.election
         @identification = question.identification
         @version = (question.version + 1)
         @status = 2
@@ -25,6 +25,7 @@ module Services
       def delete_question
         ActiveRecord::Base.transaction do
           question.update(status: 1)
+          delete_answer_service
           question_create_service
         end
       end
@@ -32,7 +33,13 @@ module Services
       def question_create_service
         params = { name: question.name }
 
-        ::Services::QuestionServices::Create.new(params: params, election_id: election, user: user, version: version, identification: identification, status: status).call
+        ::Services::QuestionServices::Create.new(params: params, election: election, user: user, version: version, identification: identification, status: status).call
+      end
+
+      def delete_answer_service
+        Answer.where(question_identification: question.identification).each do |a|
+          ::Services::AnswerServices::Delete.new(current_answer: a, user: user).call
+        end
       end
     end
   end

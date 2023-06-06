@@ -7,7 +7,7 @@ module Services
         @params = params
         @question = current_question
         @user = user
-        @election = question.election_id
+        @election = question.election
         @identification = question.identification
         @version = (question.version + 1)
       end
@@ -30,7 +30,7 @@ module Services
       end
 
       def question_create_service
-        ::Services::QuestionServices::Create.new(params: params, election_id: election, user: user, version: version, identification: identification).call
+        ::Services::QuestionServices::Create.new(params: params, election: election, user: user, version: version, identification: identification).call
       end
     end
   end
