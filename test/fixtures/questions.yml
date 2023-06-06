@@ -3,7 +3,13 @@
 one:
   name: MyString
   election: one
+  identification: "201f7b2d-7490-4b39-8eca-94e90d212bq1"
+  election_identification: "201f7b2d-7490-4b39-8eca-94e90d212be1"
+  version: 1
 
 two:
   name: MyString
   election: two
+  identification: "201f7b2d-7490-4b39-8eca-94e90d212bq2"
+  election_identification: "201f7b2d-7490-4b39-8eca-94e90d212be2"
+  version: 1

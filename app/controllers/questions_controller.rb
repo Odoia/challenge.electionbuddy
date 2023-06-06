@@ -8,8 +8,7 @@ class QuestionsController < ApplicationController
   # GET /questions
   # GET /questions.json
   def index
-   election_identification = Election.find(params['election_id']).identification
-   @questions = Question.where(election_identification: election_identification).where(status: 0)
+    @questions = Question.where(election_identification: @election.identification).where(status: 0)
   end
 
   # GET /questions/1
@@ -29,12 +28,12 @@ class QuestionsController < ApplicationController
   def create
     @question = question_create_service
     respond_to do |format|
-      if @question.blank?
-        format.html { render :new }
-        format.json { render json: @question.errors, status: :unprocessable_entity }
-      else
+      if @question.errors.blank?
         format.html { redirect_to @question, notice: 'Question was successfully created.' }
         format.json { render :show, status: :created, location: @question }
+      else
+        format.html { render :new }
+        format.json { render json: @question.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -44,12 +43,12 @@ class QuestionsController < ApplicationController
   def update
     respond_to do |format|
       @question = question_update_service
-      if @question.blank?
-        format.html { render :edit }
-        format.json { render json: @question.errors, status: :unprocessable_entity }
-      else
+      if @question.errors.blank?
         format.html { redirect_to @question, notice: 'Question was successfully updated.' }
         format.json { render :show, status: :ok, location: @question }
+      else
+        format.html { render :edit }
+        format.json { render json: @question.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -57,8 +56,7 @@ class QuestionsController < ApplicationController
   # DELETE /questions/1
   # DELETE /questions/1.json
   def destroy
-    election = @question.election
-    question_delete_service
+    election = question_delete_service.election
     respond_to do |format|
       format.html { redirect_to election_questions_url(election), notice: 'Question was successfully destroyed.' }
       format.json { head :no_content }

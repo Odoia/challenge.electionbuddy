@@ -7,6 +7,6 @@ class AuditController < ApplicationController
   # GET /audit.json
   # todo: resolve this query only in one query
   def index
-    @elections = Election.joins(questions: [:answers]).order(created_at: :desc)
+    @elections = Election.joins(questions: [:answers]).distinct.order(created_at: :desc)
   end
 end

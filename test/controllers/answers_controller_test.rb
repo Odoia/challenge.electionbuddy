@@ -39,11 +39,11 @@ class AnswersControllerTest < ActionDispatch::IntegrationTest
 
   test 'should update answer' do
     patch answer_url(@answer), params: { answer: { name: @answer.name } }
-    assert_redirected_to answer_url(@answer)
+    assert_redirected_to answer_url(Answer.last)
   end
 
   test 'should destroy answer' do
-    assert_difference('Answer.count', -1) do
+    assert_difference('Answer.where(status: 2).count', 1) do
       delete answer_url(@answer)
     end
 

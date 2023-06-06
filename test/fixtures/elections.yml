@@ -5,6 +5,8 @@ one:
   start_at: 2019-02-05 10:03:49
   end_at: 2019-02-05 10:03:49
   user: one
+  identification: "201f7b2d-7490-4b39-8eca-94e90d212be1"
+  version: 1
   settings:
     visibility: public
 
@@ -13,5 +15,7 @@ two:
   start_at: 2019-02-05 10:03:49
   end_at: 2019-02-05 10:03:49
   user: two
+  identification: "201f7b2d-7490-4b39-8eca-94e90d212be2"
+  version: 1
   settings:
     visibility: public

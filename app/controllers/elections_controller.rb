@@ -29,12 +29,12 @@ class ElectionsController < ApplicationController
     #@election = Election.new(election_params.merge(user: current_user))
 
     respond_to do |format|
-      if @election.blank?
-        format.html { render :new }
-        format.json { render json: @election.errors, status: :unprocessable_entity }
-      else
+      if @election.errors.blank?
         format.html { redirect_to @election, notice: 'Election was successfully created.' }
         format.json { render :show, status: :created, location: @election }
+      else
+        format.html { render :new }
+        format.json { render json: @election.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -44,12 +44,12 @@ class ElectionsController < ApplicationController
   def update
     @election = election_update_service
     respond_to do |format|
-      if @election.blank?
-        format.html { render :edit }
-        format.json { render json: @election.errors, status: :unprocessable_entity }
-      else
+      if @election.errors.blank?
         format.html { redirect_to @election, notice: 'Election was successfully updated.' }
         format.json { render :show, status: :ok, location: @election }
+      else
+        format.html { render :edit }
+        format.json { render json: @election.errors, status: :unprocessable_entity }
       end
     end
   end

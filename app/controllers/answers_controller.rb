@@ -8,8 +8,7 @@ class AnswersController < ApplicationController
   # GET /answers
   # GET /answers.json
   def index
-    question_identification = Question.find(params['question_id']).identification
-    @answers = Answer.where(question_identification: question_identification).where(status: 0)
+    @answers = Answer.where(question_identification: @question.identification).where(status: 0)
   end
 
   # GET /answers/1
@@ -30,12 +29,12 @@ class AnswersController < ApplicationController
     @answer = answer_create_service 
 
     respond_to do |format|
-      if @answer.blank?
-        format.html { render :new }
-        format.json { render json: @answer.errors, status: :unprocessable_entity }
-      else
+      if @answer.errors.blank?
         format.html { redirect_to @answer, notice: 'Answer was successfully created.' }
         format.json { render :show, status: :created, location: @answer }
+      else
+        format.html { render :new }
+        format.json { render json: @answer.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -46,12 +45,12 @@ class AnswersController < ApplicationController
     @answer = answer_update_service
 
     respond_to do |format|
-      if @answer.blank?
-        format.html { render :edit }
-        format.json { render json: @answer.errors, status: :unprocessable_entity }
-      else
+      if @answer.errors.blank?
         format.html { redirect_to @answer, notice: 'Answer was successfully updated.' }
         format.json { render :show, status: :ok, location: @answer }
+      else
+        format.html { render :edit }
+        format.json { render json: @answer.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -59,8 +58,7 @@ class AnswersController < ApplicationController
   # DELETE /answers/1
   # DELETE /answers/1.json
   def destroy
-    question = @answer.question
-    answer_delete_service
+    question = answer_delete_service.question
     respond_to do |format|
       format.html { redirect_to question_answers_url(question), notice: 'Answer was successfully destroyed.' }
       format.json { head :no_content }

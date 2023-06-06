@@ -38,11 +38,11 @@ class ElectionsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should update election' do
     patch election_url(@election), params: { election: { end_at: @election.end_at, name: @election.name, settings: @election.settings, start_at: @election.start_at } }
-    assert_redirected_to election_url(@election)
+    assert_redirected_to election_url(Election.last)
   end
 
   test 'should destroy election' do
-    assert_difference('Election.count', -1) do
+    assert_difference('Election.where(status: 2).count', 1) do
       delete election_url(@election)
     end
 
