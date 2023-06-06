@@ -22,3 +22,16 @@ Please fork this repository on Github and push your code up to your own fork on 
 If you have any questions, email Brady at bradyb@electionbuddy.com.
 
 Good luck!
+
+
+## Comments on code implementation - Tiago Henrique
+
+In order to create an Audit history and avoid making a database table with previous and current versions of each change, I decided to keep updates changes into a versionable system. 
+So for each object type, I changed the table to have the new fields: `identification`, `version` and `status`. 
+So on each update, it is created a new register with the new version of the data and status, while the old one is kept in the database with the previous information and new status (inactive). 
+It also works for deletion, where the status is changed to `deleted` on the action. 
+
+For the Audit list, I placed it in the main page, in order to show all update information, even deletions on elections. 
+It is shown separated by Election > Question > Answer, and ordered from older to newer.
+
+All existing tests are passing.
