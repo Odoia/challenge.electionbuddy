@@ -8,7 +8,7 @@ class QuestionsController < ApplicationController
   # GET /questions
   # GET /questions.json
   def index
-    @questions = Question.all
+    @questions = Question.where(status: 0)
   end
 
   # GET /questions/1
@@ -22,19 +22,18 @@ class QuestionsController < ApplicationController
 
   # GET /questions/1/edit
   def edit; end
-
+  
   # POST /questions
   # POST /questions.json
   def create
-    @question = Question.new(question_params.merge(election: @election))
-
+    @question = question_create_service
     respond_to do |format|
-      if @question.save
-        format.html { redirect_to @question, notice: 'Question was successfully created.' }
-        format.json { render :show, status: :created, location: @question }
-      else
+      if @question.blank?
         format.html { render :new }
         format.json { render json: @question.errors, status: :unprocessable_entity }
+      else
+        format.html { redirect_to @question, notice: 'Question was successfully created.' }
+        format.json { render :show, status: :created, location: @question }
       end
     end
   end
@@ -43,12 +42,13 @@ class QuestionsController < ApplicationController
   # PATCH/PUT /questions/1.json
   def update
     respond_to do |format|
-      if @question.update(question_params)
-        format.html { redirect_to @question, notice: 'Question was successfully updated.' }
-        format.json { render :show, status: :ok, location: @question }
-      else
+      @question = question_update_service
+      if @question.blank?
         format.html { render :edit }
         format.json { render json: @question.errors, status: :unprocessable_entity }
+      else
+        format.html { redirect_to @question, notice: 'Question was successfully updated.' }
+        format.json { render :show, status: :ok, location: @question }
       end
     end
   end
@@ -57,7 +57,7 @@ class QuestionsController < ApplicationController
   # DELETE /questions/1.json
   def destroy
     election = @question.election
-    @question.destroy
+    question_delete_service
     respond_to do |format|
       format.html { redirect_to election_questions_url(election), notice: 'Question was successfully destroyed.' }
       format.json { head :no_content }
@@ -78,5 +78,28 @@ class QuestionsController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def question_params
     params.require(:question).permit(:name)
+  end
+
+  def question_create_service
+    params = question_params
+    election = @election.id
+    user = current_user
+
+    ::Services::QuestionServices::Create.new(params: params, election_id: election, user: user).call
+  end
+
+  def question_update_service
+    params = question_params
+    question = @question
+    user = current_user
+
+    ::Services::QuestionServices::Update.new(params: params, current_question: question, user: user).call
+  end
+
+  def question_delete_service
+    question = @question
+    user = current_user
+
+    ::Services::QuestionServices::Delete.new(current_question: question, user: user).call
   end
 end

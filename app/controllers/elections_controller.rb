@@ -7,7 +7,7 @@ class ElectionsController < ApplicationController
   # GET /elections
   # GET /elections.json
   def index
-    @elections = current_user.elections
+    @elections = Election.where(user_id: current_user.id).where(status: 0)
   end
 
   # GET /elections/1
@@ -25,15 +25,16 @@ class ElectionsController < ApplicationController
   # POST /elections
   # POST /elections.json
   def create
-    @election = Election.new(election_params.merge(user: current_user))
+    @election = election_create_service
+    #@election = Election.new(election_params.merge(user: current_user))
 
     respond_to do |format|
-      if @election.save
-        format.html { redirect_to @election, notice: 'Election was successfully created.' }
-        format.json { render :show, status: :created, location: @election }
-      else
+      if @election.blank?
         format.html { render :new }
         format.json { render json: @election.errors, status: :unprocessable_entity }
+      else
+        format.html { redirect_to @election, notice: 'Election was successfully created.' }
+        format.json { render :show, status: :created, location: @election }
       end
     end
   end
@@ -41,13 +42,14 @@ class ElectionsController < ApplicationController
   # PATCH/PUT /elections/1
   # PATCH/PUT /elections/1.json
   def update
+    @election = election_update_service
     respond_to do |format|
-      if @election.update(election_params)
-        format.html { redirect_to @election, notice: 'Election was successfully updated.' }
-        format.json { render :show, status: :ok, location: @election }
-      else
+      if @election.blank?
         format.html { render :edit }
         format.json { render json: @election.errors, status: :unprocessable_entity }
+      else
+        format.html { redirect_to @election, notice: 'Election was successfully updated.' }
+        format.json { render :show, status: :ok, location: @election }
       end
     end
   end
@@ -55,7 +57,7 @@ class ElectionsController < ApplicationController
   # DELETE /elections/1
   # DELETE /elections/1.json
   def destroy
-    @election.destroy
+    election_delete_service
     respond_to do |format|
       format.html { redirect_to elections_url, notice: 'Election was successfully destroyed.' }
       format.json { head :no_content }
@@ -72,5 +74,27 @@ class ElectionsController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def election_params
     params.require(:election).permit(:name, :start_at, :end_at, :visibility)
+  end
+
+  def election_create_service
+    params = election_params
+    user = current_user
+
+    ::Services::ElectionServices::Create.new(params: params, user: user).call
+  end
+
+  def election_update_service
+    params = election_params
+    election = @election
+    user = current_user
+
+    ::Services::ElectionServices::Update.new(params: params, current_election: election, user: user).call
+  end
+
+  def election_delete_service
+    election = @election
+    user = current_user
+
+    ::Services::ElectionServices::Delete.new(current_election: election, user: user).call
   end
 end

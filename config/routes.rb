@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :audit, only: %i[index]
   resources :elections do
     resources :questions, shallow: true do
       resources :answers, shallow: true

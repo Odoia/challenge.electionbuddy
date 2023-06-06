@@ -8,7 +8,7 @@ class AnswersController < ApplicationController
   # GET /answers
   # GET /answers.json
   def index
-    @answers = Answer.all
+    @answers = Answer.where(status: 0)
   end
 
   # GET /answers/1
@@ -26,15 +26,15 @@ class AnswersController < ApplicationController
   # POST /answers
   # POST /answers.json
   def create
-    @answer = Answer.new(answer_params.merge(question: @question))
+    @answer = answer_create_service 
 
     respond_to do |format|
-      if @answer.save
-        format.html { redirect_to @answer, notice: 'Answer was successfully created.' }
-        format.json { render :show, status: :created, location: @answer }
-      else
+      if @answer.blank?
         format.html { render :new }
         format.json { render json: @answer.errors, status: :unprocessable_entity }
+      else
+        format.html { redirect_to @answer, notice: 'Answer was successfully created.' }
+        format.json { render :show, status: :created, location: @answer }
       end
     end
   end
@@ -42,13 +42,15 @@ class AnswersController < ApplicationController
   # PATCH/PUT /answers/1
   # PATCH/PUT /answers/1.json
   def update
+    @answer = answer_update_service
+
     respond_to do |format|
-      if @answer.update(answer_params)
-        format.html { redirect_to @answer, notice: 'Answer was successfully updated.' }
-        format.json { render :show, status: :ok, location: @answer }
-      else
+      if @answer.blank?
         format.html { render :edit }
         format.json { render json: @answer.errors, status: :unprocessable_entity }
+      else
+        format.html { redirect_to @answer, notice: 'Answer was successfully updated.' }
+        format.json { render :show, status: :ok, location: @answer }
       end
     end
   end
@@ -57,7 +59,7 @@ class AnswersController < ApplicationController
   # DELETE /answers/1.json
   def destroy
     question = @answer.question
-    @answer.destroy
+    answer_delete_service
     respond_to do |format|
       format.html { redirect_to question_answers_url(question), notice: 'Answer was successfully destroyed.' }
       format.json { head :no_content }
@@ -78,5 +80,28 @@ class AnswersController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def answer_params
     params.require(:answer).permit(:name)
+  end
+
+  def answer_create_service
+    params = answer_params
+    question = @question.id
+    user = current_user
+
+    ::Services::AnswerServices::Create.new(params: params, question_id: question, user: user).call
+  end
+
+  def answer_update_service
+    params = answer_params
+    answer = @answer
+    user = current_user
+
+    ::Services::AnswerServices::Update.new(params: params, current_answer: answer, user: user).call
+  end
+
+  def answer_delete_service
+    answer = @answer
+    user = current_user
+
+    ::Services::AnswerServices::Delete.new(current_answer: answer, user: user).call
   end
 end

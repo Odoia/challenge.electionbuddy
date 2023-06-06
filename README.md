@@ -12,7 +12,7 @@ You'll note that most of the basic structure (`Election`, `Question`, `Answer`, 
 
 ## Running
 
-You can run it the usual way: `bundle install`, `bundle exec rails server`, or you can use the provided Dockerfile and scripts:
+You can run it the usual way: `bundle install`,`bin/rails db:schema:load`, `bundle exec rails server`, or you can use the provided Dockerfile and scripts:
 
 * `./run.sh`: Build and run, bound to localhost port 3000.
 * `./test.sh`: Build and run tests (should pass).
